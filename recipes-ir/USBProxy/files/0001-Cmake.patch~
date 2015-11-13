@@ -1,0 +1,315 @@
+From 864fee43da4e36358a6f69beeaeae143b9fa4071 Mon Sep 17 00:00:00 2001
+From: Hammad Ahmed <hammad.ahmed@irdeto.com>
+Date: Thu, 12 Nov 2015 18:04:31 -0500
+Subject: [PATCH] yocto
+
+---
+ CMakeLists.txt                       |    1 +
+ src/Plugins/Devices/CMakeLists.txt   |    1 +
+ src/Plugins/Hosts/GadgetFS_helpers.c |    1 +
+ src/bindings/python/CMakeLists.txt   |   26 ++++++++++++
+ src/cmake/modules/FindUSB1.cmake     |   16 ++++---
+ src/lib/Manager.cpp                  |   76 ++++++++++++++++++++++------------
+ src/lib/Manager.h                    |    8 ++--
+ 7 files changed, 93 insertions(+), 36 deletions(-)
+ create mode 100644 CMakeLists.txt
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..febd4f0
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1 @@
++add_subdirectory(src)
+diff --git a/src/Plugins/Devices/CMakeLists.txt b/src/Plugins/Devices/CMakeLists.txt
+index 3cd9e9d..d06f1a9 100644
+--- a/src/Plugins/Devices/CMakeLists.txt
++++ b/src/Plugins/Devices/CMakeLists.txt
+@@ -14,6 +14,7 @@ LIST(APPEND PLUGINS_LINK_LIBS USBProxy)
+ LIST(APPEND PLUGINS DeviceProxy_Loopback DeviceProxy_TCP DeviceProxy_Callback)
+ 
+ find_package(USB1)
++message("HAMMAD ${LIBUSB_FOUND}")
+ 
+ if( ${LIBUSB_FOUND} )
+ 	LIST(APPEND PLUGINS DeviceProxy_LibUSB)
+diff --git a/src/Plugins/Hosts/GadgetFS_helpers.c b/src/Plugins/Hosts/GadgetFS_helpers.c
+index 9459eac..2be572a 100644
+--- a/src/Plugins/Hosts/GadgetFS_helpers.c
++++ b/src/Plugins/Hosts/GadgetFS_helpers.c
+@@ -199,6 +199,7 @@ const char * find_gadget_filename()
+ 		"atmel_usba_udc",
+ 		"musb-hdrc",
+ 		"sw_usb_udc",
++		"ci_hdrc_imx"
+ 		NULL
+ 	};
+ 
+diff --git a/src/bindings/python/CMakeLists.txt b/src/bindings/python/CMakeLists.txt
+index 25d34fc..7258838 100644
+--- a/src/bindings/python/CMakeLists.txt
++++ b/src/bindings/python/CMakeLists.txt
+@@ -7,6 +7,27 @@ set(PACKAGE libusbproxyAPI)
+ 
+ include_directories(${libusbproxy_SOURCE_DIR} ${usbproxy_filters_SOURCE_DIR} ${usbproxy_devices_SOURCE_DIR})
+ 
++set(python_scripts
++	${CMAKE_CURRENT_SOURCE_DIR}/deviceproxy.py
++	${CMAKE_CURRENT_SOURCE_DIR}/filters.py
++	${CMAKE_CURRENT_SOURCE_DIR}/kbd.py
++	${CMAKE_CURRENT_SOURCE_DIR}/keymap.py
++	${CMAKE_CURRENT_SOURCE_DIR}/ubertooth.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBClass.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBConfiguration.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBDevice.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBEndpoint.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBInterface.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBKeyboard.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBMassStorage.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBProxyApp.py
++	${CMAKE_CURRENT_SOURCE_DIR}/usbproxy-fd-keyboard.py
++	${CMAKE_CURRENT_SOURCE_DIR}/usbproxy-fd-umass.py
++	${CMAKE_CURRENT_SOURCE_DIR}/usbproxy.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USB.py
++	${CMAKE_CURRENT_SOURCE_DIR}/USBVendor.py
++	CACHE INTERNAL "List of python scripts")
++
+ # Target
+ set(cpp_sources
+ 	${CMAKE_CURRENT_SOURCE_DIR}/API.cpp
+@@ -27,3 +48,8 @@ install(TARGETS USBProxyAPI
+         LIBRARY DESTINATION lib${LIB_SUFFIX}
+         COMPONENT sharedlibs
+         )
++install(FILES ${python_scripts}
++	DESTINATION bindings/python/USBProxy
++	COMPONENT pythonScripts
++	PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
++	)
+diff --git a/src/cmake/modules/FindUSB1.cmake b/src/cmake/modules/FindUSB1.cmake
+index 0cbf802..cf3033f 100644
+--- a/src/cmake/modules/FindUSB1.cmake
++++ b/src/cmake/modules/FindUSB1.cmake
+@@ -24,15 +24,19 @@ else (LIBUSB_INCLUDE_DIR AND LIBUSB_LIBRARIES)
+     pkg_check_modules(PC_LIBUSB libusb-1.0)
+   ENDIF(NOT WIN32)
+ 
+-  FIND_PATH(LIBUSB_INCLUDE_DIR libusb.h
++  if( ${PC_LIBUSB_VERSION} VERSION_EQUAL 1.0.19 )
++    FIND_PATH(LIBUSB_INCLUDE_DIR libusb.h
+     PATHS ${PC_LIBUSB_INCLUDEDIR} ${PC_LIBUSB_INCLUDE_DIRS})
+ 
+-  FIND_LIBRARY(LIBUSB_LIBRARIES NAMES usb-1.0
++    FIND_LIBRARY(LIBUSB_LIBRARIES NAMES usb-1.0
+     PATHS ${PC_LIBUSB_LIBDIR} ${PC_LIBUSB_LIBRARY_DIRS})
+ 
+-  include(FindPackageHandleStandardArgs)
+-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBUSB DEFAULT_MSG LIBUSB_LIBRARIES LIBUSB_INCLUDE_DIR)
++    include(FindPackageHandleStandardArgs)
++    FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBUSB DEFAULT_MSG LIBUSB_LIBRARIES LIBUSB_INCLUDE_DIR)
+ 
+-  MARK_AS_ADVANCED(LIBUSB_INCLUDE_DIR LIBUSB_LIBRARIES)
++    MARK_AS_ADVANCED(LIBUSB_INCLUDE_DIR LIBUSB_LIBRARIES)
++  else( ${PC_LIBUSB_VERSION} VERSION_EQUAL 1.0.19 )
++    set(LIBUSB_FOUND FALSE)
++  endif( ${PC_LIBUSB_VERSION} VERSION_EQUAL 1.0.19 )
+ 
+-endif (LIBUSB_INCLUDE_DIR AND LIBUSB_LIBRARIES)
+\ No newline at end of file
++endif (LIBUSB_INCLUDE_DIR AND LIBUSB_LIBRARIES)
+diff --git a/src/lib/Manager.cpp b/src/lib/Manager.cpp
+index 5be90c7..b2a1ed6 100644
+--- a/src/lib/Manager.cpp
++++ b/src/lib/Manager.cpp
+@@ -65,36 +65,40 @@ Manager::~Manager() {
+ 	int i;
+ 	for (i=0;i<16;i++) {
+ 		if (in_readers[i]) {
+-			if (in_readerThreads[i].joinable()) {
++			if (in_readerThreads[i]) {
+ 				in_readers[i]->please_stop();
+-				in_readerThreads[i].join();
++				pthread_join(in_readerThreads[i], NULL);
++				in_readerThreads[i] = 0;
+ 			}
+ 			delete(in_readers[i]);
+ 			in_readers[i]=NULL;
+ 		}
+ 
+ 		if (in_writers[i]) {
+-			if (in_writerThreads[i].joinable()) {
++			if (in_writerThreads[i]) {
+ 				in_writers[i]->please_stop();
+-				in_writerThreads[i].join();
++				pthread_join(in_writerThreads[i], NULL);
++				in_writerThreads[i] = 0;
+ 			}
+ 			delete(in_writers[i]);
+ 			in_writers[i]=NULL;
+ 		}
+ 
+ 		if (out_readers[i]) {
+-			if (out_readerThreads[i].joinable()) {
++			if (out_readerThreads[i]) {
+ 				out_readers[i]->please_stop();
+-				out_readerThreads[i].join();
++				pthread_join(out_readerThreads[i], NULL);
++				out_readerThreads[i] = 0;
+ 			}
+ 			delete(out_readers[i]);
+ 			out_readers[i]=NULL;
+ 		}
+ 
+ 		if (out_writers[i]) {
+-			if (out_writerThreads[i].joinable()) {
++			if (out_writerThreads[i]) {
+ 				out_writers[i]->please_stop();
+-				out_writerThreads[i].join();
++				pthread_join(out_writerThreads[i], NULL);
++				out_writerThreads[i] = 0;
+ 			}
+ 			delete(out_writers[i]);
+ 			out_writers[i]=NULL;
+@@ -224,6 +228,16 @@ inline std::string shex(unsigned num)
+ 	return os.str();
+ }
+ 
++void* call_relay_read(void* r) {
++    RelayReader* reader = (RelayReader*) r;
++    reader->relay_read();
++}
++
++void* call_relay_write(void* r) {
++    RelayWriter* writer = (RelayWriter*) r;
++    writer->relay_write();
++}
++
+ void Manager::start_control_relaying(){
+ 	clean_mqueue();
+ 
+@@ -350,11 +364,13 @@ void Manager::start_control_relaying(){
+ 	}
+ 
+ 	if (out_readers[0]) {
+-		out_readerThreads[0] = std::thread(&RelayReader::relay_read, out_readers[0]);
++		//out_readerThreads[0] = std::thread(&RelayReader::relay_read, out_readers[0]);
++		pthread_create(&out_readerThreads[i], NULL, &call_relay_read, out_readers[0]);
+ 	}
+ 	if (status!=USBM_SETUP) {status=USBM_SETUP_ABORT;stop_relaying();return;}
+ 	if (out_writers[0]) {
+-		out_writerThreads[0] = std::thread(&RelayWriter::relay_write, out_writers[0]);
++		//out_writerThreads[0] = std::thread(&RelayWriter::relay_write, out_writers[0]);
++		pthread_create(&out_writerThreads[i], NULL, &call_relay_write, out_writers[0]);
+ 	}
+ 	if (status!=USBM_SETUP) {stop_relaying();return;}
+ 	status=USBM_RELAYING;
+@@ -476,16 +492,20 @@ void Manager::start_data_relaying() {
+ 
+ 	for(i=1;i<16;i++) {
+ 		if (in_readers[i]) {
+-			in_readerThreads[i] = std::thread(&RelayReader::relay_read, in_readers[i]);
++			//in_readerThreads[i] = std::thread(&RelayReader::relay_read, in_readers[i]);
++			pthread_create(&in_readerThreads[i], NULL, &call_relay_read, in_readers[i]);
+ 		}
+ 		if (in_writers[i]) {
+-			in_writerThreads[i] = std::thread(&RelayWriter::relay_write, in_writers[i]);
++			//in_writerThreads[i] = std::thread(&RelayWriter::relay_write, in_writers[i]);
++			pthread_create(&in_writerThreads[i], NULL, &call_relay_write, in_writers[i]);
+ 		}
+ 		if (out_readers[i]) {
+-			out_readerThreads[i] = std::thread(&RelayReader::relay_read, out_readers[i]);
++			//out_readerThreads[i] = std::thread(&RelayReader::relay_read, out_readers[i]);
++			pthread_create(&out_readerThreads[i], NULL, &call_relay_read, out_readers[i]);
+ 		}
+ 		if (out_writers[i]) {
+-			out_writerThreads[i] = std::thread(&RelayWriter::relay_write, out_writers[i]);
++			//out_writerThreads[i] = std::thread(&RelayWriter::relay_write, out_writers[i]);
++			pthread_create(&out_writerThreads[i], NULL, &call_relay_write, out_writers[i]);
+ 		}
+ 	}
+ }
+@@ -503,10 +523,10 @@ void Manager::stop_relaying(){
+ 
+ 	//signal all relayer threads to stop ASAP
+ 	for(i=0;i<16;i++) {
+-		if (in_readerThreads[i].joinable()) {in_readers[i]->please_stop();}
+-		if (in_writerThreads[i].joinable()) {in_writers[i]->please_stop();}
+-		if (out_readerThreads[i].joinable()) {out_readers[i]->please_stop();}
+-		if (out_writerThreads[i].joinable()) {out_writers[i]->please_stop();}
++		if (in_readerThreads[i]) {in_readers[i]->please_stop();}
++		if (in_writerThreads[i]) {in_writers[i]->please_stop();}
++		if (out_readerThreads[i]) {out_readers[i]->please_stop();}
++		if (out_writerThreads[i]) {out_writers[i]->please_stop();}
+ 	}
+ 
+ 	//wait for all injector threads to stop
+@@ -519,15 +539,17 @@ void Manager::stop_relaying(){
+ 	for(i=0;i<16;i++) {
+ 		if (in_endpoints[i]) {in_endpoints[i]=NULL;}
+ 		if (in_readers[i]) {
+-			if (in_readerThreads[i].joinable()) {
+-				in_readerThreads[i].join();
++			if (in_readerThreads[i]) {
++				pthread_join(in_readerThreads[i], NULL);
++				in_readerThreads[i] = 0;
+ 			}
+ 			delete(in_readers[i]);
+ 			in_readers[i]=NULL;
+ 		}
+ 		if (in_writers[i]) {
+-			if (in_writerThreads[i].joinable()) {
+-				in_writerThreads[i].join();
++			if (in_writerThreads[i]) {
++				pthread_join(in_writerThreads[i], NULL);
++				in_writerThreads[i] = 0;
+ 			}
+ 			delete(in_writers[i]);
+ 			in_writers[i]=NULL;
+@@ -535,15 +557,17 @@ void Manager::stop_relaying(){
+ 
+ 		if (out_endpoints[i]) {out_endpoints[i]=NULL;}
+ 		if (out_readers[i]) {
+-			if (out_readerThreads[i].joinable()) {
+-				out_readerThreads[i].join();
++			if (out_readerThreads[i]) {
++				pthread_join(out_readerThreads[i], NULL);
++				out_readerThreads[i] = 0;
+ 			}
+ 			delete(out_readers[i]);
+ 			out_readers[i]=NULL;
+ 		}
+ 		if (out_writers[i]) {
+-			if (out_writerThreads[i].joinable()) {
+-				out_writerThreads[i].join();
++			if (out_writerThreads[i]) {
++				pthread_join(out_writerThreads[i], NULL);
++				out_writerThreads[i] = 0;
+ 			}
+ 			delete(out_writers[i]);
+ 			out_writers[i]=NULL;
+diff --git a/src/lib/Manager.h b/src/lib/Manager.h
+index 5c99ace..81eef97 100644
+--- a/src/lib/Manager.h
++++ b/src/lib/Manager.h
+@@ -54,14 +54,14 @@ private:
+ 	Endpoint* in_endpoints[16];
+ 	RelayReader* in_readers[16];
+ 	RelayWriter* in_writers[16];
+-	std::thread in_readerThreads[16];
+-	std::thread in_writerThreads[16];
++	pthread_t in_readerThreads[16];
++	pthread_t in_writerThreads[16];
+ 
+ 	Endpoint* out_endpoints[16];
+ 	RelayReader* out_readers[16];
+ 	RelayWriter* out_writers[16];
+-	std::thread out_readerThreads[16];
+-	std::thread out_writerThreads[16];
++	pthread_t out_readerThreads[16];
++	pthread_t out_writerThreads[16];
+ 
+ 	void start_data_relaying();
+ 
+-- 
+1.7.9.5
+
