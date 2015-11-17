@@ -14,7 +14,7 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig cmake
 
-RDEPENDS_${PN} = "python3-modules python3-core python3-misc"
+RDEPENDS_${PN} = "python3-modules python3-core python3-misc python3-evdev"
 
 FILES_${PN} = "${prefix}/bindings/python/USBProxy/*.py \
                ${libdir}/USBProxy \
