@@ -39,7 +39,7 @@ do_install () {
     #
     # The files fetched via SRC_URI (above) will be in ${WORKDIR}.
     #
-    install -m 0755 ${WORKDIR}/inject-on-boot.sh  ${D}${sysconfdir}/init.d/
+    install -m 0755 ${WORKDIR}/home/test/fsl-community-bsp/sources/meta-ir-extras/recipes-ir/inject-on-boot/file/inject-on-boot.sh ${D}${sysconfdir}/init.d/
 
 
     #
