@@ -4,7 +4,7 @@ BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 PR = "r0"
 
 LICENSE = "CLOSED"
-LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=1484b9683e3fc1dd9f5cf802a23fe67c"
+LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=412591c731a8e9212c95a171804990ef"
 
 SRC_URI = "file://inject-on-boot.sh"
 
