@@ -3,6 +3,12 @@ DESCRIPTION = "Startup script that starts USBProxy on boot "
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 PR = "r0"
 
+# Runtime dependencies
+#
+# Add a line similar to the following to ensure any packages needed for the scripts to run are installed in the image.
+#
+# RDEPENDS_${PN} = "parted"
+
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=412591c731a8e9212c95a171804990ef"
 
