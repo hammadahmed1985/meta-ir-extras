@@ -6,7 +6,7 @@ PR = "r0"
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=412591c731a8e9212c95a171804990ef"
 
-SRC_URI = "file://file/inject-on-boot.sh"
+SRC_URI = "file:///home/test/fsl-community-bsp/sources/meta-ir-extras/recipes-ir/inject-on-boot/file/inject-on-boot.sh"
 
 do_install() {
     #
