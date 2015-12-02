@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=412591c731a8e9212c95a171804990e
 
 SRC_URI = "file:///home/test/fsl-community-bsp/sources/meta-ir-extras/recipes-ir/inject-on-boot/file/inject-on-boot.sh"
 
-do_install() {
+do_install () {
     #
     # Create directories:
     #   ${D}${sysconfdir}/init.d - will hold the scripts
