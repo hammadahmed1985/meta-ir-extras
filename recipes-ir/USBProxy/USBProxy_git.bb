@@ -23,5 +23,12 @@ FILES_${PN} = "${prefix}/bindings/python/USBProxy/*.py \
                ${libdir}/libUSBProxyAPI.so.0 \
                ${bindir}/usb-mitm \
                ${bindir}/uinputme \
-               ${bindir}/timerinputme"
+               ${bindir}/timerinputme \
+               ${bindir}/evdev-usb-bridge \
+               ${bindir}/buttonsme \
+               ${bindir}/inject-reset-button \
+               ${bindir}/loopbacktest \
+               ${bindir}/send-a-udp \
+               ${bindir}/write-loopbacktest \
+               "
 
