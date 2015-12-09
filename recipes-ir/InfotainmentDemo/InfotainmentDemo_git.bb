@@ -8,9 +8,9 @@ inherit qmake5
 
 SRCREV = "${AUTOREV}"
 
-SRC_URI = "git://github.com/Anteros78/infotainment_demo.git;branch=master"
+SRC_URI = "git://scm-core.ott.dev.intra/automotive-demo;branch=master"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/git/infotainment_demo"
 
 inherit pkgconfig
 
