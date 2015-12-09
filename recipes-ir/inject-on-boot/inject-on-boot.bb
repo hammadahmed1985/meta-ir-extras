@@ -10,9 +10,9 @@ PR = "r0"
 # RDEPENDS_${PN} = "parted"
 
 LICENSE = "CLOSED"
-LIC_FILES_CHKSUM = "file://inject-on-boot.sh;md5=412591c731a8e9212c95a171804990ef"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/inject-on-boot.sh;md5=d9f5cf5a12902c90c903d9817fadfddb"
 
-SRC_URI = "file:///home/test/fsl-community-bsp/sources/meta-ir-extras/recipes-ir/inject-on-boot/file/inject-on-boot.sh"
+SRC_URI = "file://inject-on-boot.sh"
 
 do_install () {
     #
@@ -39,7 +39,7 @@ do_install () {
     #
     # The files fetched via SRC_URI (above) will be in ${WORKDIR}.
     #
-    install -m 0755 ${WORKDIR}/home/test/fsl-community-bsp/sources/meta-ir-extras/recipes-ir/inject-on-boot/file/inject-on-boot.sh ${D}${sysconfdir}/init.d/
+    install -m 0755 ${WORKDIR}/inject-on-boot.sh ${D}${sysconfdir}/init.d/
 
 
     #
