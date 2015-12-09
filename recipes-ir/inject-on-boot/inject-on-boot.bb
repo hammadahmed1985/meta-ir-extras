@@ -50,7 +50,7 @@ do_install () {
     #   rc5.d/S90run-script will be called (with %1='start') when entering runlevel 5.
     #   rc5.d/K90run-script will be called (with %1='stop') when exiting runlevel 5.
     #
-    ln -sf ../init.d/inject-on-boot.sh  ${D}${sysconfdir}/rcS.d/S90inject-on-boot.sh
+    ln -sf ../init.d/inject-on-boot.sh  ${D}${sysconfdir}/rc5.d/S90inject-on-boot.sh
 
 }
 
