@@ -1,5 +1,6 @@
 #!/bin/bash
 
+kill -9 $(pidof connmand)
 udhcpc -i eth0 > /dev/null&
 
 next_evdev="$(( $(ls /dev/input/event* | wc -l) ))"
