@@ -5,6 +5,7 @@ PR = "r0"
 LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1484b9683e3fc1dd9f5cf802a23fe67c"
 
+PV = "0.1+gitr${SRCPV}"
 SRCREV = "${AUTOREV}"
 
 SRC_URI = "git://github.com/potjaune/USBProxy.git;branch=rate-limit-inject"
