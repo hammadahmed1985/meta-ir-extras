@@ -1,0 +1,71 @@
+From 312b558412ec0e40f48380655a9c086be12117ec Mon Sep 17 00:00:00 2001
+From: Hammad Ahmed <hammad.ahmed@irdeto.com>
+Date: Thu, 19 Nov 2015 09:04:43 -0500
+Subject: [PATCH] GPIO keys and leds for usb injector
+
+---
+ arch/arm/boot/dts/imx6qdl-wandboard.dtsi |   48 ++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-wandboard.dtsi b/arch/arm/boot/dts/imx6qdl-wandboard.dtsi
+index 5244e95..11d38cd 100644
+--- a/arch/arm/boot/dts/imx6qdl-wandboard.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-wandboard.dtsi
+@@ -61,6 +61,54 @@
+ 		};
+ 	};
+ 
++	gpio_keys {
++		compatible = "gpio-keys";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_gpio>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		switch_A {
++			label = "Arcade Button A";
++			debounce_interval = <50>;
++			linux,code = <1>;
++			gpios = <&gpio3 11 0x5>; /* Pin 4 pn JP-4*/
++			gpio-key,wakeup;
++		};
++		switch_B {
++			label = "Arcade Button B";
++			debounce_interval = <50>;
++			linux,code = <2>;
++			gpios = <&gpio3 27 0x5>; /* Pin 6 pn JP-4*/
++			gpio-key,wakeup;
++		};
++		switch_C {
++			label = "Arcade Button C";
++			debounce_interval = <50>;
++			linux,code = <3>;
++			gpios = <&gpio6 31 0x5>; /* Pin 8 pn JP-4*/
++			gpio-key,wakeup;
++		};
++	};
++
++	gpio-leds-for-switches {
++		compatible = "gpio-leds";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_gpio>;
++		switch_led_A {
++			label = "switch:green:led_A";
++			gpios = <&gpio3 26 0>; /* Pin 14 pn JP-4*/
++			linux,default-trigger = "none";
++			default-state = "off";
++		};
++
++		switch_led_B {
++			label = "switch:green:led_B";
++			gpios = <&gpio3 8 0>; /* Pin 16 pn JP-4*/
++			linux,default-trigger = "none";
++			default-state = "off";
++		};
++	};
++
+ 	sound {
+ 		compatible = "fsl,imx6-wandboard-sgtl5000", 
+                              "fsl,imx-audio-sgtl5000";
+-- 
+1.7.9.5
+
