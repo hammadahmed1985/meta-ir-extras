@@ -1,6 +1,7 @@
 #!/bin/bash
 
 kill -9 $(pidof connmand)
+/etc/init.d/renew-on-up.sh &
 
 next_evdev="$(( $(ls /dev/input/event* | wc -l) ))"
 timerinputme &
