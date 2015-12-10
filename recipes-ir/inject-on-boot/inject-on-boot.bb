@@ -12,7 +12,7 @@ PR = "r0"
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/inject-on-boot.sh;md5=d9f5cf5a12902c90c903d9817fadfddb"
 
-SRC_URI = "file://inject-on-boot.sh"
+SRC_URI = "file://inject-on-boot.sh file://11-evdev-excludes.conf"
 
 do_install () {
     #
@@ -52,5 +52,10 @@ do_install () {
     #
     ln -sf ../init.d/inject-on-boot.sh  ${D}${sysconfdir}/rc5.d/S90inject-on-boot.sh
 
+
+    install -m 0755 -d ${D}${datadir}/X11/xorg.conf.d
+    install -m 0644 ${WORKDIR}/11-evdev-excludes.conf ${D}${datadir}/X11/xorg.conf.d/
 }
+
+FILES_${PN} += "${datadir}/X11/xorg.conf.d/*"
 
