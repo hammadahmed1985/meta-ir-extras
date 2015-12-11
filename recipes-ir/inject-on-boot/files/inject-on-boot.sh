@@ -1,6 +1,7 @@
 #!/bin/bash
 
 kill -9 $(pidof connmand)
+kill -9 $(pidof udhcpc)
 udhcpc -i eth0 &
 /etc/init.d/renew-on-up.sh &
 
