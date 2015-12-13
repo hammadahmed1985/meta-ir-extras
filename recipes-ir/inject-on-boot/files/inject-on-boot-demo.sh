@@ -1,7 +1,6 @@
 #!/bin/bash
 
-kill -9 $(pidof connmand)
-udhcpc -i eth0 &
+kill -9 $(pidof udhcpc)
 
-python3 $(which buttonsme) &
+python3 -B $(which buttonsme) &
 
